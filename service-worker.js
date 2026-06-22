@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'muaini-v24-advanced-suite';
+const CACHE_NAME = 'muaini-v25-layout-fix';
 const APP_SHELL = [
   './', './index.html', './config.js', './advanced-features.css', './advanced-features.js', './manifest.json',
   './logo-placeholder.png', './logo-placeholder-192.png', './logo-placeholder-512.png',
@@ -38,7 +38,7 @@ self.addEventListener('fetch', event => {
   if (url.origin !== self.location.origin) return;
 
   // صفحات HTML وملفات الإعدادات: الشبكة أولًا ثم الكاش.
-  const networkFirst = event.request.mode === 'navigate' || /\/(index\.html|config\.js|service-worker\.js)$/.test(url.pathname);
+  const networkFirst = event.request.mode === 'navigate' || /\/(index\.html|config\.js|service-worker\.js|advanced-features\.css|advanced-features\.js)$/.test(url.pathname);
   event.respondWith((async () => {
     if (networkFirst) {
       try {
