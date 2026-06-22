@@ -1,0 +1,32 @@
+ابدأ من هنا — مُعيني بلس 4.0
+============================
+
+1) للتجربة المحلية الكاملة:
+- ثبّت Node.js 20 أو أحدث.
+- افتح Terminal داخل مجلد المشروع.
+- نفّذ: npm install
+- نفّذ: npm run dev
+- افتح الرابط الذي يعرضه Netlify CLI.
+
+2) لتفعيل الحسابات والمزامنة وPasskeys والدوائر:
+- أنشئ مشروع Supabase.
+- شغّل الملف supabase/schema.sql كاملًا داخل SQL Editor.
+- ضع Supabase URL وAnon Key في config.js.
+- ضع SUPABASE_URL وSUPABASE_SERVICE_ROLE_KEY في Environment variables على Netlify.
+
+3) لتفعيل Passkeys:
+- انشر الموقع على HTTPS.
+- أضف متغير PASSKEY_ORIGIN مثل: https://your-site.netlify.app
+- أضف PASSKEY_RP_ID مثل: your-site.netlify.app
+- سجّل الدخول السحابي أولًا، ثم افتح: المزيد ← الخصوصية ← إضافة مفتاح مرور.
+
+4) للإشعارات المغلقة:
+- أنشئ مفاتيح VAPID: npm run generate-vapid
+- ضع VAPID_PUBLIC_KEY وVAPID_PRIVATE_KEY وVAPID_SUBJECT في Netlify.
+
+5) للدفع والأصوات المميزة:
+- أضف مفاتيح Stripe الموضحة في README-AR.md.
+
+6) للنشر:
+- اربط المجلد بمستودع Git ثم انشره على Netlify، أو استخدم Netlify CLI.
+- رفع index.html وحده لا يشغّل Functions أو Passkeys أو Push الحقيقي.

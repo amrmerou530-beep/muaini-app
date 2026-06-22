@@ -1,0 +1,43 @@
+أسماء ملفات الأذان والإقامة المعتمدة
+====================================
+
+ضع جميع الملفات التالية داخل مجلد اسمه audio بجوار index.html:
+
+1) adhan-cairo-mohamed-ali-albanna.mp3
+   أذان القاهرة — الشيخ محمد علي البنا
+
+2) adhan-fajr-mishary-alafasy.mp3
+   أذان الفجر — الشيخ مشاري راشد العفاسي
+
+3) adhan-turkey-2.mp3
+   أذان تركيا — النسخة الثانية
+
+4) adhan-georgia.mp3
+   أذان جورجيا
+
+5) adhan-mohamed-al-demerdash.mp3
+   أذان الشيخ محمد الدمرداش — جامع الملك فهد بحائل
+
+6) adhan-badie-gado.mp3
+   أذان بصوت بديع جادو
+
+7) adhan-masjid-al-haram-1.mp3
+   أذان الحرم المكي — النسخة الأولى
+
+8) adhan-fajr-yasser-al-dosari.mp3
+   أذان الفجر — الشيخ ياسر الدوسري
+
+9) adhan-islamweb-extra.mp3
+   ملف الأذان الإضافي الذي أرسله صاحب الموقع
+
+10) iqama-mishary-rashid.mp3
+    إقامة الصلاة — الشيخ مشاري راشد العفاسي
+
+الترتيب الصحيح:
+index.html
+service-worker.js
+manifest.json
+audio/
+  الملفات العشرة السابقة
+
+مهم: الأسماء والامتدادات وحالة الحروف يجب أن تتطابق حرفيًا مع القائمة.

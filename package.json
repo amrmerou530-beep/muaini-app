@@ -1,0 +1,20 @@
+{
+  "name": "muaini-super-app",
+  "version": "4.0.0",
+  "private": true,
+  "description": "منصة مُعيني بلس: PWA متكاملة مع Ramadan، Passkeys، Background Sync، Supabase، Web Push وStripe",
+  "scripts": {
+    "dev": "netlify dev",
+    "generate-vapid": "node scripts/generate-vapid.js"
+  },
+  "dependencies": {
+    "@netlify/functions": "^3.1.10",
+    "@supabase/supabase-js": "^2.57.4",
+    "stripe": "^18.5.0",
+    "web-push": "^3.6.7",
+    "@simplewebauthn/server": "^13.0.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^23.5.0"
+  }
+}
