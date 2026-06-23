@@ -1,0 +1,10 @@
+إصلاح مُعيني 5.1
+
+ارفع الملفات الأربعة التالية إلى جذر مستودع GitHub واستبدل القديمة:
+1) index.html
+2) advanced-features.css
+3) advanced-features.js
+4) service-worker.js
+
+هذه النسخة تضع تصميم ومحرك المصحف الجديد داخل index.html نفسه، حتى لا تضيع التعديلات إذا لم تُرفع ملفات CSS/JS الجديدة.
+بعد نشر Netlify: افتح الموقع واضغط Ctrl+F5.

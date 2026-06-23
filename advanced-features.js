@@ -4,7 +4,7 @@
    مُعيني بلس 4.0 — إضافات غير مدمرة فوق النسخة الكاملة
    تعمل محليًا، وتتوسع سحابيًا عند إعداد Supabase/Netlify.
 ========================================================= */
-window.MUAINI_APP_VERSION = '4.0.0';
+window.MUAINI_APP_VERSION = '5.0.0';
 const ADVANCED_STORAGE_VERSION = 1;
 let advancedSearchTimer = null;
 let advancedSyncTimer = null;
