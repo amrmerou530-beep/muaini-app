@@ -1,0 +1,15 @@
+تحديث تسجيل الدخول بجوجل - مُعيني 6.1
+
+الملفات المطلوبة للرفع:
+1) index.html
+2) config.js
+3) service-worker.js
+
+ماذا أُضيف؟
+- زر الدخول بحساب Google داخل الحساب السحابي والمزامنة.
+- تفعيل حفظ جلسة Supabase في المتصفح: persistSession + autoRefreshToken + detectSessionInUrl.
+- تحديث كاش Service Worker حتى تظهر التعديلات فور النشر.
+
+تنبيه أمان:
+- config.js يحتوي على Supabase URL و publishable key فقط.
+- لا تضع Client Secret ولا service_role ولا Stripe Secret داخل config.js.
