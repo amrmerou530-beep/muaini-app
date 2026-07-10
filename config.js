@@ -4,8 +4,8 @@
   لا تضع SUPABASE_SERVICE_ROLE_KEY أو STRIPE_SECRET_KEY هنا مطلقًا.
 */
 window.MUAINI_CONFIG = {
-  supabaseUrl: '',
-  supabaseAnonKey: '',
+  supabaseUrl: 'https://gznvsqlqyrfazfnipzzh.supabase.co',
+  supabaseAnonKey: 'sb_publishable_ZjzYPj8EKlzxKXHMHs_7pg_mmLhTAks',
   siteName: 'منصة مُعيني',
   supportEmail: '',
   premiumPriceLabel: 'اشتراك شهري',

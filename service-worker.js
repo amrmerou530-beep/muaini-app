@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'muaini-v30-organized-ui';
+const CACHE_NAME = 'muaini-v31-google-auth';
 const APP_SHELL = [
   './', './index.html', './config.js', './advanced-features.css', './advanced-features.js', './muaini-layout-v6.css', './muaini-layout-v6.js', './manifest.json',
   './logo-placeholder.png', './logo-placeholder-192.png', './logo-placeholder-512.png',
