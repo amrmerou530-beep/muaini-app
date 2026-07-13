@@ -1026,6 +1026,27 @@ flex-direction: column; align-items: center; gap: 12px; font-weight: bold; }
             .password-choice-actions { grid-template-columns:1fr; }
             .ai-subtitle { padding: 0 20px; text-align: center; }
         }
+
+
+        /* ================= نظام الدخول والحسابات ================= */
+        .auth-choice-stack { display:grid; gap:12px; margin-top:20px; }
+        .auth-choice-btn {
+            width:100%; min-height:56px; border-radius:14px; padding:14px 18px;
+            font-size:1.08rem; font-weight:800; cursor:pointer; transition:.25s;
+            display:flex; align-items:center; justify-content:center; gap:10px;
+        }
+        .auth-choice-btn:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(0,0,0,.28); }
+        .google-login-btn { background:#fff; color:#202124; border:1px solid #dadce0; }
+        .guest-login-btn { background:rgba(255,255,255,.05); color:#fff; border:1px solid rgba(212,175,55,.34); }
+        .special-login-btn { background:transparent; color:var(--gold-color); border:1px dashed var(--card-border); }
+        .auth-note { margin-top:15px; color:#9fb8aa; font-size:.92rem; line-height:1.7; }
+        .account-login-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:16px; }
+        .account-login-grid .full { grid-column:1 / -1; }
+        .account-info-box { margin:14px 0; padding:15px; border-radius:14px; border:1px solid var(--card-border); background:rgba(0,0,0,.2); }
+        .account-info-box b { display:block; color:#ffe9a3; margin-bottom:5px; }
+        .special-password-settings { margin-top:16px; padding-top:16px; border-top:1px dashed rgba(212,175,55,.22); }
+        .guest-warning { color:#ffd083; }
+        @media(max-width:640px){ .account-login-grid{grid-template-columns:1fr}.account-login-grid .full{grid-column:auto} }
 </style>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0d3126">
@@ -1564,32 +1585,6 @@ body.mushaf-focus-mode .mushaf-stage { min-height: calc(100vh - 115px); }
   .reader-page-bar .page-btn { padding-inline: 12px; }
 }
 
-.google-auth-btn {
-  border: 1px solid rgba(255,255,255,.25);
-  border-radius: 14px;
-  padding: 13px 18px;
-  background: #fff;
-  color: #1f1f1f;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 10px 24px rgba(0,0,0,.18);
-}
-.welcome-google-btn { width: 100%; margin-top: 10px; }
-.google-auth-btn::before {
-  content: "G";
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  margin-left: 8px;
-  border-radius: 50%;
-  background: conic-gradient(from -45deg,#4285f4 0 25%,#34a853 0 50%,#fbbc05 0 75%,#ea4335 0);
-  color: #fff;
-  font-family: Arial, sans-serif;
-  font-weight: 900;
-}
-
 </style>
     <link rel="stylesheet" href="muaini-layout-v6.css?v=6.0.0">
 </head>
@@ -1613,19 +1608,20 @@ body.mushaf-focus-mode .mushaf-stage { min-height: calc(100vh - 115px); }
             <button class="welcome-btn" onclick="submitCountryStep()">التالي ➔</button>
         </div>
         <div id="step-auth" class="welcome-card">
-            <h2>🔐 تسجيل الدخول للمنصة</h2>
-            <p style="color:#a2bfa6">سجّل الدخول لحفظ بياناتك على هذا الجهاز:</p>
-            <input type="email" id="auth-email" class="login-input" placeholder="البريد الإلكتروني">
-            <input type="password" id="auth-password" class="login-input" placeholder="كلمة المرور">
-            <button class="welcome-btn" onclick="submitLoginAuth()">تسجيل الدخول ➔</button>
-            <button class="google-auth-btn welcome-google-btn" type="button" onclick="cloudSignInWithGoogle()">الدخول بحساب Google</button>
-            <button class="other-option-btn" onclick="showSpecialNamesStep()">✨ غير ذلك (الأسماء الخاصة) 👥</button>
+            <h2>🔐 اختر طريقة الدخول</h2>
+            <p style="color:#a2bfa6">اختر الطريقة المناسبة لك. حساب Google والأسماء الخاصة يحفظان بياناتك، أما وضع الضيف فلا يحفظ أي شيء.</p>
+            <div class="auth-choice-stack">
+                <button class="auth-choice-btn google-login-btn" type="button" onclick="startGoogleLogin()">🌐 الدخول بحساب Google</button>
+                <button class="auth-choice-btn guest-login-btn" type="button" onclick="enterGuestMode()">👤 الدخول كضيف</button>
+                <button class="auth-choice-btn special-login-btn" type="button" onclick="showSpecialNamesStep()">✨ الأسماء الخاصة</button>
+            </div>
+            <p class="auth-note">بعد أول دخول بحساب Google أو باسم خاص، ستفتح المنصة تلقائيًا في المرات التالية على هذا الجهاز.</p>
         </div>
         <div id="step-special-names" class="welcome-card">
             <h2>👥 لوحة الوصول للأسماء الخاصة</h2>
             <p style="color:#a2bfa6">اختر اسمك للدخول إلى ملفك المحمي:</p>
             <div class="names-grid" id="special-names-grid"></div>
-            <button class="other-option-btn" onclick="goToStep('step-auth')">➔ العودة لتسجيل الدخول</button>
+            <button class="other-option-btn" onclick="goToStep('step-auth')">← العودة إلى طرق الدخول</button>
         </div>
         <div id="step-password-choice" class="welcome-card">
             <h2>🔐 تم التحقق من كلمة السر</h2>
@@ -2078,19 +2074,40 @@ body.mushaf-focus-mode .mushaf-stage { min-height: calc(100vh - 115px); }
         </div>
 
         <div class="extension-card full">
-          <h2>☁️ الحساب السحابي والمزامنة</h2>
-          <div id="cloud-account-status" class="status-pill warn">وضع محلي: بياناتك محفوظة على هذا الجهاز.</div>
-          <div class="cloud-auth-form" style="margin-top:15px">
-            <input id="cloud-email" class="smart-input" type="email" placeholder="البريد الإلكتروني">
-            <input id="cloud-password" class="smart-input" type="password" placeholder="كلمة السر (6 أحرف على الأقل)">
-            <button class="smart-btn" onclick="cloudSignUp()">إنشاء حساب</button>
-            <button class="smart-btn" onclick="cloudSignIn()">تسجيل الدخول</button>
-            <button class="google-auth-btn" type="button" onclick="cloudSignInWithGoogle()" aria-label="تسجيل الدخول بحساب Google">الدخول بحساب Google</button>
-            <button class="soft-btn" onclick="cloudResetPassword()">نسيت كلمة السر</button>
-            <button class="soft-btn" onclick="syncCloudNow()">مزامنة الآن</button>
-            <button class="danger-btn full" onclick="cloudSignOut()">تسجيل الخروج من السحابة</button>
+          <h2>👤 الحساب وتسجيل الدخول</h2>
+          <div id="cloud-account-status" class="status-pill warn">جارٍ التحقق من الحساب...</div>
+          <div class="account-info-box">
+            <b id="account-display-name">المستخدم الحالي: —</b>
+            <span id="account-login-type">طريقة الدخول: —</span>
           </div>
-          <p class="privacy-note">إذا لم تضف مفاتيح Supabase في <code>config.js</code> ستستمر المنصة بالعمل محليًا دون فقد أي ميزة أساسية.</p>
+          <div class="settings-grid">
+            <div class="field-group">
+              <label>الدولة الأساسية للحساب</label>
+              <select id="account-country-select" class="smart-select">
+                <option value="EG">مصر (القاهرة)</option>
+                <option value="TR">تركيا (إسطنبول)</option>
+                <option value="SA">السعودية (مكة)</option>
+                <option value="AE">الإمارات (أبوظبي)</option>
+                <option value="MA">المغرب (الرباط)</option>
+              </select>
+            </div>
+          </div>
+          <div class="account-login-grid">
+            <button class="smart-btn" type="button" onclick="saveAccountCountryFromSettings()">حفظ الدولة وتحديث المواقيت</button>
+            <button id="account-sync-btn" class="soft-btn" type="button" onclick="syncCloudNow()">☁️ مزامنة الآن</button>
+            <button class="soft-btn full" type="button" onclick="switchMuainiAccount()">🔄 تبديل المستخدم</button>
+            <button class="danger-btn full" type="button" onclick="logoutMuainiAccount()">تسجيل الخروج</button>
+          </div>
+          <div id="special-password-settings" class="special-password-settings" style="display:none">
+            <h3>🔑 تغيير كلمة سر الاسم الخاص</h3>
+            <div class="settings-grid">
+              <div class="field-group"><label>كلمة السر الحالية</label><input id="settings-current-special-password" class="smart-input" type="password" autocomplete="current-password"></div>
+              <div class="field-group"><label>كلمة السر الجديدة</label><input id="settings-new-special-password" class="smart-input" type="password" autocomplete="new-password"></div>
+              <div class="field-group"><label>تأكيد كلمة السر الجديدة</label><input id="settings-confirm-special-password" class="smart-input" type="password" autocomplete="new-password"></div>
+            </div>
+            <button class="smart-btn" type="button" onclick="changeSpecialPasswordFromSettings()">حفظ كلمة السر الجديدة</button>
+          </div>
+          <p id="account-privacy-note" class="privacy-note">يتم فصل بيانات كل حساب أو اسم عن الآخر.</p>
         </div>
 
         <div class="extension-card">
@@ -2330,7 +2347,7 @@ function showPremiumVoiceMessage(voiceName = 'هذا الصوت') {
 ميزة الاشتراك ستُربط لاحقًا بنظام حساب ودفع آمن.`);
 }
 
-let currentUser = { name: 'زائر', type: 'normal', country: 'EG' };
+let currentUser = { name: 'زائر', type: 'guest', country: 'EG' };
 let systemLogs = {};
 let profileMeta = {};
 let currentDayKey = '';
@@ -2356,6 +2373,50 @@ let activeIqamaPreview = { voiceId: '', button: null };
 let iqamaTimerIds = [];
 let prayerAlertTimers = [];
 let pendingSpecialName = '';
+
+const MUAINI_ACTIVE_IDENTITY_KEY = 'muaini_active_identity';
+window.MUAINI_GUEST_MODE = false;
+
+/* يمنع أي حفظ دائم أثناء وضع الضيف، مع إبقاء عمل المنصة داخل الجلسة الحالية فقط. */
+const muainiNativeStorage = {
+  getItem: Storage.prototype.getItem,
+  setItem: Storage.prototype.setItem,
+  removeItem: Storage.prototype.removeItem
+};
+function isMuainiStorageKey(key) {
+  const value = String(key || '');
+  return value.startsWith('muaini_') || value.startsWith('registration_date_');
+}
+Storage.prototype.getItem = function(key) {
+  if (window.MUAINI_GUEST_MODE && this === window.localStorage && isMuainiStorageKey(key)) return null;
+  return muainiNativeStorage.getItem.call(this, key);
+};
+Storage.prototype.setItem = function(key, value) {
+  if (window.MUAINI_GUEST_MODE && this === window.localStorage && isMuainiStorageKey(key)) return;
+  return muainiNativeStorage.setItem.call(this, key, value);
+};
+Storage.prototype.removeItem = function(key) {
+  if (window.MUAINI_GUEST_MODE && this === window.localStorage && isMuainiStorageKey(key)) return;
+  return muainiNativeStorage.removeItem.call(this, key);
+};
+
+function saveActiveIdentity(identity) {
+  if (!identity || identity.type === 'guest') return;
+  muainiNativeStorage.setItem.call(localStorage, MUAINI_ACTIVE_IDENTITY_KEY, JSON.stringify(identity));
+}
+
+function readActiveIdentity() {
+  try {
+    return JSON.parse(muainiNativeStorage.getItem.call(localStorage, MUAINI_ACTIVE_IDENTITY_KEY) || 'null');
+  } catch (_) {
+    return null;
+  }
+}
+
+function clearActiveIdentity() {
+  muainiNativeStorage.removeItem.call(localStorage, MUAINI_ACTIVE_IDENTITY_KEY);
+}
+
 
 /* =========================
    بيانات الأذكار
@@ -2489,7 +2550,7 @@ function normalizeDayRecord(record) {
 function ensureCurrentDay() {
   const freshKey = getLocalDateKey();
   if (freshKey !== currentDayKey) {
-    if (currentDayKey && currentUser.name !== 'زائر') saveLogs();
+    if (currentDayKey && currentUser.type !== 'guest') saveLogs();
     currentDayKey = freshKey;
     systemLogs[currentDayKey] = normalizeDayRecord(systemLogs[currentDayKey]);
     bindCurrentDayState();
@@ -2510,42 +2571,60 @@ function bindCurrentDayState() {
 }
 
 function loadUserSpecificDatabase() {
-  const safeName = safeUserName();
-  systemLogs = JSON.parse(localStorage.getItem(`muaini_logs_${safeName}`) || '{}');
-  profileMeta = JSON.parse(localStorage.getItem(`muaini_meta_${safeName}`) || '{}');
-  currentUser.country = sessionStorage.getItem('muaini_selected_country') || profileMeta.country || currentUser.country || 'EG';
-  prayerTimesData = { ...(profileMeta.prayerTimes || COUNTRY_CONFIG[currentUser.country].fallback) };
-  currentDayKey = getLocalDateKey();
-  systemLogs[currentDayKey] = normalizeDayRecord(systemLogs[currentDayKey]);
-  bindCurrentDayState();
-  lastReadPage = Number(localStorage.getItem(`muaini_last_page_${safeName}`) || 1);
-  currentPage = lastReadPage;
-  profileMeta.tasbeehTotal = Number(profileMeta.tasbeehTotal || 0);
-  profileMeta.tasbeehTarget = Number(profileMeta.tasbeehTarget || 100);
-  profileMeta.theme = profileMeta.theme || localStorage.getItem('muaini_theme') || 'default';
-  profileMeta.adhanAssignments = profileMeta.adhanAssignments || {};
-  profileMeta.adhanVolume = Number.isFinite(Number(profileMeta.adhanVolume)) ? Number(profileMeta.adhanVolume) : 0.9;
-  profileMeta.iqama = {
-    ...DEFAULT_IQAMA_SETTINGS,
-    ...(profileMeta.iqama || {})
-  };
-  profileMeta.iqama.delayMinutes = Number(profileMeta.iqama.delayMinutes || DEFAULT_IQAMA_SETTINGS.delayMinutes);
-  profileMeta.country = currentUser.country;
-  applyTheme(profileMeta.theme, false);
+  if (currentUser.type === 'guest') {
+    systemLogs = {};
+    profileMeta = {};
+    currentUser.country = sessionStorage.getItem('muaini_selected_country') || currentUser.country || 'EG';
+    prayerTimesData = { ...(COUNTRY_CONFIG[currentUser.country] || COUNTRY_CONFIG.EG).fallback };
+    currentDayKey = getLocalDateKey();
+    systemLogs[currentDayKey] = normalizeDayRecord(null);
+    bindCurrentDayState();
+    lastReadPage = 1;
+    currentPage = 1;
+    profileMeta.tasbeehTotal = 0;
+    profileMeta.tasbeehTarget = 100;
+    profileMeta.theme = 'default';
+    profileMeta.adhanAssignments = {};
+    profileMeta.adhanVolume = 0.9;
+    profileMeta.iqama = { ...DEFAULT_IQAMA_SETTINGS };
+    profileMeta.country = currentUser.country;
+    applyTheme('default', false);
+  } else {
+    const safeName = safeUserName();
+    systemLogs = JSON.parse(localStorage.getItem(`muaini_logs_${safeName}`) || '{}');
+    profileMeta = JSON.parse(localStorage.getItem(`muaini_meta_${safeName}`) || '{}');
+    currentUser.country = profileMeta.country || sessionStorage.getItem('muaini_selected_country') || currentUser.country || 'EG';
+    prayerTimesData = { ...(profileMeta.prayerTimes || (COUNTRY_CONFIG[currentUser.country] || COUNTRY_CONFIG.EG).fallback) };
+    currentDayKey = getLocalDateKey();
+    systemLogs[currentDayKey] = normalizeDayRecord(systemLogs[currentDayKey]);
+    bindCurrentDayState();
+    lastReadPage = Number(localStorage.getItem(`muaini_last_page_${safeName}`) || 1);
+    currentPage = lastReadPage;
+    profileMeta.tasbeehTotal = Number(profileMeta.tasbeehTotal || 0);
+    profileMeta.tasbeehTarget = Number(profileMeta.tasbeehTarget || 100);
+    profileMeta.theme = profileMeta.theme || localStorage.getItem('muaini_theme') || 'default';
+    profileMeta.adhanAssignments = profileMeta.adhanAssignments || {};
+    profileMeta.adhanVolume = Number.isFinite(Number(profileMeta.adhanVolume)) ? Number(profileMeta.adhanVolume) : 0.9;
+    profileMeta.iqama = { ...DEFAULT_IQAMA_SETTINGS, ...(profileMeta.iqama || {}) };
+    profileMeta.iqama.delayMinutes = Number(profileMeta.iqama.delayMinutes || DEFAULT_IQAMA_SETTINGS.delayMinutes);
+    profileMeta.country = currentUser.country;
+    applyTheme(profileMeta.theme, false);
+  }
   const selector = document.getElementById('theme-selector');
-  if (selector) selector.value = profileMeta.theme;
+  if (selector) selector.value = profileMeta.theme || 'default';
   const countrySelector = document.getElementById('user-country-select');
   if (countrySelector) countrySelector.value = currentUser.country;
   const planSelect = document.getElementById('quran-plan');
   if (planSelect && profileMeta.quranPlan) planSelect.value = profileMeta.quranPlan;
   const statsTitle = document.getElementById('stats-user-title');
   if (statsTitle) statsTitle.textContent = `📊 لوحة التحليلات والموجز الإحصائي لـ (${currentUser.name})`;
-  saveLogs();
+  if (currentUser.type !== 'guest') saveLogs();
   renderAdhanSettings().catch(() => {});
+  hydrateAccountSettings();
 }
 
 function saveLogs() {
-  if (!currentDayKey || currentUser.name === 'زائر') return;
+  if (!currentDayKey || currentUser.type === 'guest') return;
   systemLogs[currentDayKey] = normalizeDayRecord(systemLogs[currentDayKey]);
   systemLogs[currentDayKey].prayers = completedPrayers;
   systemLogs[currentDayKey].azkar = completedAzkarToday;
@@ -2567,7 +2646,6 @@ function goToStep(stepId) {
 async function submitCountryStep() {
   currentUser.country = document.getElementById('user-country-select').value;
   sessionStorage.setItem('muaini_selected_country', currentUser.country);
-  localStorage.setItem('muaini_last_country', currentUser.country);
   const config = COUNTRY_CONFIG[currentUser.country];
   prayerTimesData = { ...config.fallback };
   const location = document.getElementById('location-display');
@@ -2576,18 +2654,56 @@ async function submitCountryStep() {
   goToStep('step-auth');
 }
 
-function submitLoginAuth() {
-  const email = document.getElementById('auth-email').value.trim();
-  const password = document.getElementById('auth-password').value.trim();
-  if (!email || !password) {
-    alert('يرجى كتابة البريد الإلكتروني وكلمة المرور.');
+async function startGoogleLogin() {
+  const client = typeof initCloudClient === 'function' ? initCloudClient() : null;
+  if (!client) {
+    alert('تعذر تشغيل تسجيل الدخول بحساب Google. تأكد من إعداد config.js.');
     return;
   }
-  currentUser.name = email.replace(/[^a-zA-Z0-9@._-]/g, '_');
-  currentUser.type = 'normal';
-  rememberPlatformLogin();
+  const selectedCountry = document.getElementById('user-country-select')?.value || currentUser.country || 'EG';
+  sessionStorage.setItem('muaini_selected_country', selectedCountry);
+  const redirectTo = `${location.origin}${location.pathname}`;
+  const { error } = await client.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
+  if (error) alert(`تعذر تسجيل الدخول بحساب Google: ${error.message}`);
+}
+
+async function activateGoogleSession(session, automatic = false) {
+  if (!session?.user) return false;
+  window.MUAINI_GUEST_MODE = false;
+  cloudSession = session;
+  currentUser.name = session.user.email || session.user.id;
+  currentUser.type = 'google';
+  currentUser.country = sessionStorage.getItem('muaini_selected_country') || 'EG';
+  const registrationKey = `registration_date_${safeUserName()}`;
+  const isFirstLogin = !localStorage.getItem(registrationKey);
+  if (isFirstLogin) localStorage.setItem(registrationKey, new Date().toISOString());
+  saveActiveIdentity({ type: 'google', name: currentUser.name });
   loadUserSpecificDatabase();
-  triggerGreeting();
+  try {
+    await loadCloudProfile();
+    await pullCloudData();
+  } catch (_) {}
+  if (isFirstLogin && !automatic) {
+    document.getElementById('welcome-overlay-container').style.display = 'flex';
+    triggerGreeting();
+  } else {
+    await enterMainPlatform();
+    showPage('prayers');
+  }
+  return true;
+}
+
+async function enterGuestMode() {
+  clearActiveIdentity();
+  window.MUAINI_GUEST_MODE = true;
+  currentUser = {
+    name: 'زائر',
+    type: 'guest',
+    country: document.getElementById('user-country-select')?.value || currentUser.country || 'EG'
+  };
+  loadUserSpecificDatabase();
+  await enterMainPlatform();
+  showPage('prayers');
 }
 
 function showSpecialNamesStep() {
@@ -2699,9 +2815,10 @@ function saveSpecialPasswordAndEnter() {
 function proceedWithSpecialLogin(name, showGreeting = true) {
   currentUser.name = name;
   currentUser.type = 'special';
+  window.MUAINI_GUEST_MODE = false;
+  saveActiveIdentity({ type: 'special', name });
   const registrationKey = `registration_date_${safeUserName(name)}`;
   if (!localStorage.getItem(registrationKey)) localStorage.setItem(registrationKey, new Date().toISOString());
-  rememberPlatformLogin();
   loadUserSpecificDatabase();
   if (showGreeting) triggerGreeting();
 }
@@ -2720,58 +2837,6 @@ function triggerGreeting() {
     : 'لوحتك الشخصية جاهزة. يبدأ كل يوم بعلامات جديدة، مع الاحتفاظ بسجل الأيام السابقة للإحصائيات.';
 }
 
-function rememberPlatformLogin() {
-  if (!currentUser?.name || currentUser.name === 'زائر') return;
-  localStorage.setItem('muaini_last_platform_user', JSON.stringify({
-    name: currentUser.name,
-    type: currentUser.type || 'normal',
-    country: currentUser.country || 'EG',
-    savedAt: new Date().toISOString()
-  }));
-}
-
-function restoreLocalPlatformLogin() {
-  try {
-    const saved = JSON.parse(localStorage.getItem('muaini_last_platform_user') || 'null');
-    if (!saved?.name) return false;
-    currentUser.name = saved.name;
-    currentUser.type = saved.type || 'normal';
-    currentUser.country = saved.country || localStorage.getItem('muaini_last_country') || sessionStorage.getItem('muaini_selected_country') || 'EG';
-    loadUserSpecificDatabase();
-    return true;
-  } catch (error) {
-    localStorage.removeItem('muaini_last_platform_user');
-    return false;
-  }
-}
-
-async function restoreCloudOrLocalLogin() {
-  const client = typeof initCloudClient === 'function' ? initCloudClient() : null;
-  if (client) {
-    const { data } = await client.auth.getSession();
-    if (data?.session?.user) {
-      cloudSession = data.session;
-      const user = data.session.user;
-      currentUser.name = user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'مستخدم Google';
-      currentUser.type = 'cloud';
-      currentUser.country = sessionStorage.getItem('muaini_selected_country') || localStorage.getItem('muaini_last_country') || 'EG';
-      rememberPlatformLogin();
-      loadUserSpecificDatabase();
-      await enterMainPlatform();
-      if (typeof loadCloudProfile === 'function') await loadCloudProfile();
-      if (typeof pullCloudData === 'function') await pullCloudData();
-      showPage('about');
-      return true;
-    }
-  }
-  if (restoreLocalPlatformLogin()) {
-    await enterMainPlatform();
-    showPage('about');
-    return true;
-  }
-  return false;
-}
-
 async function enterMainPlatform() {
   document.getElementById('welcome-overlay-container').style.display = 'none';
   ensureCurrentDay();
@@ -2782,6 +2847,118 @@ async function enterMainPlatform() {
   initializeNotificationState().catch(() => {});
   syncPushSubscription().catch(() => {});
   scheduleDailyPrayerAlerts();
+}
+
+
+function showWelcomeForNewUser() {
+  window.MUAINI_GUEST_MODE = false;
+  document.getElementById('welcome-overlay-container').style.display = 'flex';
+  const skipCountry = sessionStorage.getItem('muaini_skip_country_once') === '1';
+  sessionStorage.removeItem('muaini_skip_country_once');
+  goToStep(skipCountry ? 'step-auth' : 'step-country');
+}
+
+async function resolveInitialAccess() {
+  try {
+    const client = typeof initCloudClient === 'function' ? initCloudClient() : null;
+    if (client) {
+      const { data } = await client.auth.getSession();
+      if (data?.session) {
+        await activateGoogleSession(data.session, true);
+        return;
+      }
+    }
+  } catch (_) {}
+
+  const identity = readActiveIdentity();
+  if (identity?.type === 'special' && SPECIAL_NAMES.includes(identity.name)) {
+    window.MUAINI_GUEST_MODE = false;
+    currentUser.name = identity.name;
+    currentUser.type = 'special';
+    loadUserSpecificDatabase();
+    await enterMainPlatform();
+    showPage('prayers');
+    return;
+  }
+  showWelcomeForNewUser();
+}
+
+function getLoginTypeLabel() {
+  if (currentUser.type === 'google') return 'حساب Google';
+  if (currentUser.type === 'special') return 'اسم خاص';
+  return 'وضع الضيف';
+}
+
+function hydrateAccountSettings() {
+  const name = document.getElementById('account-display-name');
+  const type = document.getElementById('account-login-type');
+  const country = document.getElementById('account-country-select');
+  const specialBox = document.getElementById('special-password-settings');
+  const syncButton = document.getElementById('account-sync-btn');
+  const note = document.getElementById('account-privacy-note');
+  if (name) name.textContent = `المستخدم الحالي: ${currentUser.name}`;
+  if (type) type.textContent = `طريقة الدخول: ${getLoginTypeLabel()}`;
+  if (country) country.value = currentUser.country || 'EG';
+  if (specialBox) specialBox.style.display = currentUser.type === 'special' ? 'block' : 'none';
+  if (syncButton) syncButton.style.display = currentUser.type === 'google' ? 'inline-flex' : 'none';
+  if (note) {
+    note.className = `privacy-note ${currentUser.type === 'guest' ? 'guest-warning' : ''}`;
+    note.textContent = currentUser.type === 'guest'
+      ? 'وضع الضيف لا يحفظ الصلوات أو الإعدادات أو أي نشاط بعد مغادرة الصفحة.'
+      : 'يتم فصل بيانات كل حساب أو اسم عن الآخر، ويُفتح الحساب تلقائيًا على هذا الجهاز.';
+  }
+}
+
+async function saveAccountCountryFromSettings() {
+  const select = document.getElementById('account-country-select');
+  const country = select?.value || 'EG';
+  currentUser.country = country;
+  sessionStorage.setItem('muaini_selected_country', country);
+  profileMeta.country = country;
+  prayerTimesData = { ...((COUNTRY_CONFIG[country] || COUNTRY_CONFIG.EG).fallback) };
+  if (currentUser.type !== 'guest') saveLogs();
+  updateHeaderDate();
+  await refreshPrayerTimesFromApi();
+  renderAllLiveData();
+  alert('تم حفظ الدولة وتحديث مواقيت الصلاة.');
+}
+
+function changeSpecialPasswordFromSettings() {
+  if (currentUser.type !== 'special') return;
+  const current = document.getElementById('settings-current-special-password')?.value || '';
+  const next = document.getElementById('settings-new-special-password')?.value.trim() || '';
+  const confirmNext = document.getElementById('settings-confirm-special-password')?.value.trim() || '';
+  const key = `muaini_pwd_${safeUserName()}`;
+  const stored = localStorage.getItem(key) || '';
+  if (current !== stored) return alert('كلمة السر الحالية غير صحيحة.');
+  if (next.length < 4) return alert('كلمة السر الجديدة يجب ألا تقل عن 4 أحرف أو أرقام.');
+  if (next !== confirmNext) return alert('تأكيد كلمة السر الجديدة غير مطابق.');
+  localStorage.setItem(key, next);
+  ['settings-current-special-password','settings-new-special-password','settings-confirm-special-password'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  alert('تم تغيير كلمة السر بنجاح.');
+}
+
+async function switchMuainiAccount() {
+  if (!confirm('هل تريد تبديل المستخدم؟ بيانات الحساب الحالي ستظل محفوظة.')) return;
+  const client = typeof initCloudClient === 'function' ? initCloudClient() : null;
+  if (currentUser.type === 'google' && client) await client.auth.signOut();
+  window.MUAINI_GUEST_MODE = false;
+  clearActiveIdentity();
+  sessionStorage.setItem('muaini_skip_country_once', '1');
+  location.reload();
+}
+
+async function logoutMuainiAccount() {
+  if (!confirm('هل تريد تسجيل الخروج من الحساب الحالي؟')) return;
+  const client = typeof initCloudClient === 'function' ? initCloudClient() : null;
+  if (currentUser.type === 'google' && client) await client.auth.signOut();
+  window.MUAINI_GUEST_MODE = false;
+  clearActiveIdentity();
+  sessionStorage.removeItem('muaini_selected_country');
+  sessionStorage.setItem('muaini_skip_country_once', '1');
+  location.reload();
 }
 
 function updateHeaderDate() {
@@ -3015,6 +3192,7 @@ function openAdhanDatabase() {
 }
 
 async function saveAdhanVoiceRecord(record) {
+  if (currentUser.type === 'guest') throw new Error('وضع الضيف لا يحفظ ملفات الأذان.');
   const db = await openAdhanDatabase();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(ADHAN_STORE_NAME, 'readwrite');
@@ -3082,7 +3260,7 @@ async function renderAdhanSettings() {
   profileMeta.adhanAssignments = profileMeta.adhanAssignments || {};
   profileMeta.adhanVolume = Number.isFinite(Number(profileMeta.adhanVolume)) ? Number(profileMeta.adhanVolume) : 0.9;
   try {
-    customAdhanVoices = currentUser.name === 'زائر' ? [] : await listAdhanVoiceRecords();
+    customAdhanVoices = currentUser.type === 'guest' ? [] : await listAdhanVoiceRecords();
   } catch (error) {
     customAdhanVoices = [];
     setAdhanAudioStatus('تعذر الوصول إلى ملفات الأذان المحفوظة في هذا المتصفح.', 'error');
@@ -4372,13 +4550,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  setTimeout(async () => {
+  setTimeout(() => {
     const splash = document.getElementById('ai-platform-splash');
     if (splash) {
       splash.classList.add('hidden');
-      setTimeout(async () => {
-        const restored = await restoreCloudOrLocalLogin();
-        if (!restored) document.getElementById('welcome-overlay-container').style.display = 'flex';
+      setTimeout(() => {
+        resolveInitialAccess().catch(() => showWelcomeForNewUser());
       }, 650);
     }
   }, 2200);
@@ -4407,16 +4584,7 @@ function isCloudConfigured() {
 
 function initCloudClient() {
   if (!isCloudConfigured()) return null;
-  if (!muainiSupabase) {
-    muainiSupabase = window.supabase.createClient(MUAINI_CONFIG.supabaseUrl, MUAINI_CONFIG.supabaseAnonKey, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        storageKey: 'muaini-supabase-auth'
-      }
-    });
-  }
+  if (!muainiSupabase) muainiSupabase = window.supabase.createClient(MUAINI_CONFIG.supabaseUrl, MUAINI_CONFIG.supabaseAnonKey);
   return muainiSupabase;
 }
 
@@ -4587,20 +4755,19 @@ function dismissInstallBanner(){document.getElementById('install-banner')?.class
 async function refreshOfflineCache(){const reg=await registerServiceWorker();await reg?.update();navigator.serviceWorker.controller?.postMessage({type:'MUAINI_REFRESH_CACHE'});setElementStatus('pwa-status','تم طلب تحديث الملفات المحفوظة.',true);}
 function exportUserBackup(){ensureExtendedMeta();const payload={version:3,exportedAt:new Date().toISOString(),user:currentUser,logs:systemLogs,meta:profileMeta,lastReadPage};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`muaini-backup-${safeUserName()}-${getLocalDateKey()}.json`;a.click();URL.revokeObjectURL(url);}
 async function importUserBackup(file){if(!file)return;try{const data=JSON.parse(await file.text());if(!data.logs||!data.meta)throw new Error('ملف غير صالح');if(!confirm('سيتم استبدال بيانات المستخدم الحالية. هل تتابع؟'))return;systemLogs=data.logs;profileMeta=data.meta;currentDayKey=getLocalDateKey();systemLogs[currentDayKey]=normalizeDayRecord(systemLogs[currentDayKey]);bindCurrentDayState();lastReadPage=Number(data.lastReadPage||1);saveLogs();renderAllLiveData();renderAllExtensions();alert('تمت استعادة النسخة بنجاح.');}catch(e){alert(`تعذر الاستعادة: ${e.message}`);}}
-function clearCurrentUserData(){if(!confirm('حذف كل بيانات هذا المستخدم من الجهاز؟ لا يمكن التراجع.'))return;localStorage.removeItem(`muaini_logs_${safeUserName()}`);localStorage.removeItem(`muaini_meta_${safeUserName()}`);localStorage.removeItem(`muaini_last_page_${safeUserName()}`);location.reload();}
+function clearCurrentUserData(){if(currentUser.type==='guest')return alert('وضع الضيف لا يحتوي على بيانات محفوظة.');if(!confirm('حذف كل بيانات هذا المستخدم من الجهاز؟ لا يمكن التراجع.'))return;localStorage.removeItem(`muaini_logs_${safeUserName()}`);localStorage.removeItem(`muaini_meta_${safeUserName()}`);localStorage.removeItem(`muaini_last_page_${safeUserName()}`);location.reload();}
 
 /* ===== الحساب السحابي ===== */
 async function initializeCloudAccount(){const client=initCloudClient();if(!client){renderCloudStatus();return;}const {data}=await client.auth.getSession();cloudSession=data.session||null;if(cloudSession)await loadCloudProfile();client.auth.onAuthStateChange(async(_event,session)=>{cloudSession=session;if(session)await loadCloudProfile();else cloudProfile=null;renderCloudStatus();});renderCloudStatus();}
 async function cloudSignUp(){const client=initCloudClient();if(!client)return cloudConfigMessage();const email=document.getElementById('cloud-email').value.trim(),password=document.getElementById('cloud-password').value;if(password.length<6)return alert('كلمة السر 6 أحرف على الأقل.');const {error}=await client.auth.signUp({email,password,options:{data:{display_name:currentUser.name}}});if(error)return alert(error.message);alert('تم إنشاء الحساب. قد تحتاج لتأكيد البريد.');}
 async function cloudSignIn(){const client=initCloudClient();if(!client)return cloudConfigMessage();const email=document.getElementById('cloud-email').value.trim(),password=document.getElementById('cloud-password').value;const {data,error}=await client.auth.signInWithPassword({email,password});if(error)return alert(error.message);cloudSession=data.session;await loadCloudProfile();await syncCloudNow();renderCloudStatus();}
-async function cloudSignInWithGoogle(){const client=initCloudClient();if(!client)return cloudConfigMessage();const redirectTo=location.origin+location.pathname;const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo,queryParams:{access_type:'offline',prompt:'select_account'}}});if(error)return alert(error.message);}
 async function cloudResetPassword(){const client=initCloudClient();if(!client)return cloudConfigMessage();const email=document.getElementById('cloud-email').value.trim();if(!email)return alert('اكتب البريد أولًا.');const {error}=await client.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)return alert(error.message);alert('تم إرسال رابط استعادة كلمة السر.');}
 async function cloudSignOut(){const client=initCloudClient();if(client)await client.auth.signOut();cloudSession=null;cloudProfile=null;renderCloudStatus();}
 function cloudConfigMessage(){alert('المزامنة السحابية جاهزة في الكود، لكنها تحتاج وضع SUPABASE_URL وSUPABASE_ANON_KEY داخل config.js.');}
 async function loadCloudProfile(){if(!cloudSession)return;const client=initCloudClient();const {data,error}=await client.from('profiles').select('*').eq('id',cloudSession.user.id).maybeSingle();if(!error)cloudProfile=data||null;const adminLink=document.getElementById('nav-admin');if(adminLink)adminLink.style.display=cloudProfile?.role==='admin'?'inline-flex':'none';renderCloudStatus();}
-function renderCloudStatus(){const box=document.getElementById('cloud-account-status'),sub=document.getElementById('subscription-status');if(box){if(!isCloudConfigured()){box.className='status-pill warn';box.textContent='وضع محلي — أضف مفاتيح Supabase لتفعيل المزامنة.';}else if(cloudSession){box.className='status-pill ok';box.textContent=`متصل: ${cloudSession.user.email}`;}else{box.className='status-pill warn';box.textContent='السحابة جاهزة — سجّل الدخول للمزامنة.';}}const plan=cloudProfile?.plan||profileMeta.subscription?.plan||'free';if(sub){sub.className=`status-pill ${plan==='premium'?'ok':'warn'}`;sub.textContent=plan==='premium'?'الخطة المميزة فعالة':'الخطة المجانية';}}
+function renderCloudStatus(){const box=document.getElementById('cloud-account-status'),sub=document.getElementById('subscription-status');if(box){if(currentUser.type==='guest'){box.className='status-pill warn';box.textContent='وضع الضيف — لا يتم حفظ أي بيانات.';}else if(currentUser.type==='google'&&cloudSession){box.className='status-pill ok';box.textContent=`حساب Google متصل: ${cloudSession.user.email}`;}else if(currentUser.type==='special'){box.className='status-pill ok';box.textContent=`الاسم الخاص متصل: ${currentUser.name}`;}else{box.className='status-pill warn';box.textContent='لم يتم اختيار حساب بعد.';}}const plan=cloudProfile?.plan||profileMeta.subscription?.plan||'free';if(sub){sub.className=`status-pill ${plan==='premium'?'ok':'warn'}`;sub.textContent=plan==='premium'?'الخطة المميزة فعالة':'الخطة المجانية';}hydrateAccountSettings();}
 function scheduleCloudSync(){if(!cloudSession||!isCloudConfigured())return;clearTimeout(cloudSyncTimer);cloudSyncTimer=setTimeout(()=>syncCloudNow(false),1500);}
-async function syncCloudNow(showMessage=true){const client=initCloudClient();if(!client)return cloudConfigMessage();if(!cloudSession){if(showMessage)alert('سجّل الدخول إلى الحساب السحابي أولًا.');return;}const payload={user_id:cloudSession.user.id,logs:systemLogs,meta:profileMeta,last_read_page:lastReadPage,updated_at:new Date().toISOString()};const {error}=await client.from('user_data').upsert(payload,{onConflict:'user_id'});if(error){if(showMessage)alert(`تعذرت المزامنة: ${error.message}`);return;}if(showMessage)alert('تمت المزامنة بنجاح.');}
+async function syncCloudNow(showMessage=true){const client=initCloudClient();if(!client)return cloudConfigMessage();if(currentUser.type!=='google'||!cloudSession){if(showMessage)alert('المزامنة السحابية متاحة لحساب Google فقط.');return;}const payload={user_id:cloudSession.user.id,logs:systemLogs,meta:profileMeta,last_read_page:lastReadPage,updated_at:new Date().toISOString()};const {error}=await client.from('user_data').upsert(payload,{onConflict:'user_id'});if(error){if(showMessage)alert(`تعذرت المزامنة: ${error.message}`);return;}if(showMessage)alert('تمت المزامنة بنجاح.');}
 async function pullCloudData(){const client=initCloudClient();if(!client||!cloudSession)return;const {data,error}=await client.from('user_data').select('*').eq('user_id',cloudSession.user.id).maybeSingle();if(!error&&data){systemLogs=data.logs||systemLogs;profileMeta={...profileMeta,...(data.meta||{})};lastReadPage=Number(data.last_read_page||lastReadPage);currentDayKey=getLocalDateKey();systemLogs[currentDayKey]=normalizeDayRecord(systemLogs[currentDayKey]);bindCurrentDayState();saveLogs();renderAllLiveData();renderAllExtensions();}}
 
 /* ===== الاشتراك والأصوات المميزة ===== */
@@ -4666,7 +4833,7 @@ async function adminBroadcastNotification(){if(!isAdmin())return alert('غير �
 
 /* ===== أدوات عامة ورسم ===== */
 function setElementStatus(id,message,ok=false){const el=document.getElementById(id);if(!el)return;el.textContent=message;el.className=el.classList.contains('status-pill')?`status-pill ${ok?'ok':'warn'}`:`notification-status ${ok?'ok':'warn'}`;}
-function hydrateExtendedSettings(){ensureExtendedMeta();const custom=profileMeta.customPrayerLocation||{};const map={ 'custom-prayer-city':custom.city||'', 'custom-prayer-country':custom.country||'', 'custom-time-zone':custom.timeZone||getTimeZone() };Object.entries(map).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.value=val;});const method=document.getElementById('prayer-method');if(method)method.value=String(custom.method||(COUNTRY_CONFIG[currentUser.country]||COUNTRY_CONFIG.EG).method);applyAccessibilitySettings();renderCloudStatus();}
+function hydrateExtendedSettings(){ensureExtendedMeta();const custom=profileMeta.customPrayerLocation||{};const map={ 'custom-prayer-city':custom.city||'', 'custom-prayer-country':custom.country||'', 'custom-time-zone':custom.timeZone||getTimeZone() };Object.entries(map).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.value=val;});const method=document.getElementById('prayer-method');if(method)method.value=String(custom.method||(COUNTRY_CONFIG[currentUser.country]||COUNTRY_CONFIG.EG).method);applyAccessibilitySettings();renderCloudStatus();hydrateAccountSettings();}
 function renderToolsPage(){renderHijriCalendar();if(profileMeta.lastLocation)locateQiblaWithCoords(profileMeta.lastLocation.lat,profileMeta.lastLocation.lon);}
 function renderAllExtensions(){renderToolsPage();renderGoalsPage();hydrateExtendedSettings();renderCloudStatus();}
 
