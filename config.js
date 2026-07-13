@@ -3,8 +3,9 @@
   اترك القيم فارغة ليعمل الموقع محليًا فقط.
   لا تضع SUPABASE_SERVICE_ROLE_KEY أو STRIPE_SECRET_KEY هنا مطلقًا.
 */
+
 window.MUAINI_CONFIG = {
-  supabaseUrl: 'https://gznvnsqlqyrfazfnipzzh.supabase.co',
+  supabaseUrl: 'https://gznvnsqlyrfazfnipzzh.supabase.co',
   supabaseAnonKey: 'sb_publishable_ZjzYPj8EKlzxKXHMHs_7pg_mmLhTAks',
   siteName: 'منصة مُعيني',
   supportEmail: '',
