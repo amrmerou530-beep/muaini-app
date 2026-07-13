@@ -2669,28 +2669,46 @@ async function startGoogleLogin() {
 
 async function activateGoogleSession(session, automatic = false) {
   if (!session?.user) return false;
-  window.MUAINI_GUEST_MODE = false;
-  cloudSession = session;
-  currentUser.name = session.user.email || session.user.id;
-  currentUser.type = 'google';
-  currentUser.country = sessionStorage.getItem('muaini_selected_country') || 'EG';
-  const registrationKey = `registration_date_${safeUserName()}`;
-  const isFirstLogin = !localStorage.getItem(registrationKey);
-  if (isFirstLogin) localStorage.setItem(registrationKey, new Date().toISOString());
-  saveActiveIdentity({ type: 'google', name: currentUser.name });
-  loadUserSpecificDatabase();
+  if (muainiGoogleActivationPromise) return muainiGoogleActivationPromise;
+
+  muainiGoogleActivationPromise = (async () => {
+    window.MUAINI_GUEST_MODE = false;
+    cloudSession = session;
+    const savedIdentity = readActiveIdentity();
+    currentUser.name = session.user.email || session.user.id;
+    currentUser.type = 'google';
+    currentUser.country = sessionStorage.getItem('muaini_selected_country')
+      || savedIdentity?.country
+      || currentUser.country
+      || 'EG';
+
+    const registrationKey = `registration_date_${safeUserName()}`;
+    const isFirstLogin = !localStorage.getItem(registrationKey);
+    if (isFirstLogin) localStorage.setItem(registrationKey, new Date().toISOString());
+    saveActiveIdentity({ type: 'google', name: currentUser.name, country: currentUser.country });
+    muainiInitialAccessResolved = true;
+
+    loadUserSpecificDatabase();
+    try {
+      await loadCloudProfile();
+      await pullCloudData();
+    } catch (_) {}
+
+    if (isFirstLogin && !automatic) {
+      document.getElementById('welcome-overlay-container').style.display = 'flex';
+      triggerGreeting();
+    } else {
+      await enterMainPlatform();
+      showPage('prayers');
+    }
+    return true;
+  })();
+
   try {
-    await loadCloudProfile();
-    await pullCloudData();
-  } catch (_) {}
-  if (isFirstLogin && !automatic) {
-    document.getElementById('welcome-overlay-container').style.display = 'flex';
-    triggerGreeting();
-  } else {
-    await enterMainPlatform();
-    showPage('prayers');
+    return await muainiGoogleActivationPromise;
+  } finally {
+    muainiGoogleActivationPromise = null;
   }
-  return true;
 }
 
 async function enterGuestMode() {
@@ -2859,14 +2877,17 @@ function showWelcomeForNewUser() {
 }
 
 async function resolveInitialAccess() {
+  if (muainiInitialAccessResolved && currentUser.type !== 'guest') return true;
+
+  const overlay = document.getElementById('welcome-overlay-container');
+  if (overlay) overlay.style.display = 'none';
+
   try {
     const client = typeof initCloudClient === 'function' ? initCloudClient() : null;
-    if (client) {
-      const { data } = await client.auth.getSession();
-      if (data?.session) {
-        await activateGoogleSession(data.session, true);
-        return;
-      }
+    const session = client ? await restorePersistedGoogleSession(client, 5000) : null;
+    if (session) {
+      await activateGoogleSession(session, true);
+      return true;
     }
   } catch (_) {}
 
@@ -2875,12 +2896,22 @@ async function resolveInitialAccess() {
     window.MUAINI_GUEST_MODE = false;
     currentUser.name = identity.name;
     currentUser.type = 'special';
+    currentUser.country = identity.country || currentUser.country || 'EG';
+    muainiInitialAccessResolved = true;
     loadUserSpecificDatabase();
     await enterMainPlatform();
     showPage('prayers');
-    return;
+    return true;
+  }
+
+  muainiInitialAccessResolved = true;
+  if (identity?.type === 'google') {
+    document.getElementById('welcome-overlay-container').style.display = 'flex';
+    goToStep('step-auth');
+    return false;
   }
   showWelcomeForNewUser();
+  return false;
 }
 
 function getLoginTypeLabel() {
@@ -2916,7 +2947,10 @@ async function saveAccountCountryFromSettings() {
   sessionStorage.setItem('muaini_selected_country', country);
   profileMeta.country = country;
   prayerTimesData = { ...((COUNTRY_CONFIG[country] || COUNTRY_CONFIG.EG).fallback) };
-  if (currentUser.type !== 'guest') saveLogs();
+  if (currentUser.type !== 'guest') {
+    saveLogs();
+    saveActiveIdentity({ type: currentUser.type, name: currentUser.name, country: currentUser.country });
+  }
   updateHeaderDate();
   await refreshPrayerTimesFromApi();
   renderAllLiveData();
@@ -3700,8 +3734,9 @@ function stopAzanAudio() {
 async function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return null;
   if (serviceWorkerRegistration) return serviceWorkerRegistration;
-  const workerUrl = new URL('service-worker.js', document.baseURI);
+  const workerUrl = new URL('service-worker.js?v=5.1.1-auth', document.baseURI);
   serviceWorkerRegistration = await navigator.serviceWorker.register(workerUrl.href, { scope: './' });
+  try { await serviceWorkerRegistration.update(); } catch (_) {}
   await navigator.serviceWorker.ready;
   return serviceWorkerRegistration;
 }
@@ -4547,6 +4582,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       ensureCurrentDay();
       updateClock();
       scheduleDailyPrayerAlerts();
+      restoreGoogleAccessIfNeeded().catch(() => {});
     }
   });
 
@@ -4582,10 +4618,100 @@ function isCloudConfigured() {
   return Boolean(MUAINI_CONFIG.supabaseUrl && MUAINI_CONFIG.supabaseAnonKey && window.supabase?.createClient);
 }
 
+let muainiAuthListenerBound = false;
+let muainiAuthRestorePromise = null;
+let muainiGoogleActivationPromise = null;
+let muainiInitialAccessResolved = false;
+
+function getMuainiSupabaseStorageKey() {
+  try {
+    const projectRef = new URL(MUAINI_CONFIG.supabaseUrl).hostname.split('.')[0];
+    return `sb-${projectRef}-auth-token`;
+  } catch (_) {
+    return 'muaini-supabase-auth-token';
+  }
+}
+
 function initCloudClient() {
   if (!isCloudConfigured()) return null;
-  if (!muainiSupabase) muainiSupabase = window.supabase.createClient(MUAINI_CONFIG.supabaseUrl, MUAINI_CONFIG.supabaseAnonKey);
+  if (!muainiSupabase) {
+    muainiSupabase = window.supabase.createClient(
+      MUAINI_CONFIG.supabaseUrl,
+      MUAINI_CONFIG.supabaseAnonKey,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+          storage: window.localStorage,
+          storageKey: getMuainiSupabaseStorageKey()
+        }
+      }
+    );
+  }
   return muainiSupabase;
+}
+
+function waitForMuainiAuthSession(client, waitMs = 3500) {
+  return new Promise(resolve => {
+    let finished = false;
+    let subscription = null;
+    const finish = session => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timer);
+      try { subscription?.unsubscribe(); } catch (_) {}
+      resolve(session || null);
+    };
+    const timer = setTimeout(() => finish(null), waitMs);
+    try {
+      const result = client.auth.onAuthStateChange((event, session) => {
+        if (session && ['INITIAL_SESSION', 'SIGNED_IN', 'TOKEN_REFRESHED', 'USER_UPDATED'].includes(event)) {
+          finish(session);
+        }
+      });
+      subscription = result?.data?.subscription || null;
+    } catch (_) {
+      finish(null);
+    }
+  });
+}
+
+async function restorePersistedGoogleSession(client = initCloudClient(), waitMs = 4500) {
+  if (!client) return null;
+  if (muainiAuthRestorePromise) return muainiAuthRestorePromise;
+
+  muainiAuthRestorePromise = (async () => {
+    try {
+      const { data, error } = await client.auth.getSession();
+      if (!error && data?.session) return data.session;
+    } catch (_) {}
+
+    try {
+      const savedAuth = localStorage.getItem(getMuainiSupabaseStorageKey());
+      if (savedAuth) {
+        const { data, error } = await client.auth.refreshSession();
+        if (!error && data?.session) return data.session;
+      }
+    } catch (_) {}
+
+    return waitForMuainiAuthSession(client, waitMs);
+  })();
+
+  try {
+    return await muainiAuthRestorePromise;
+  } finally {
+    muainiAuthRestorePromise = null;
+  }
+}
+
+async function restoreGoogleAccessIfNeeded() {
+  const identity = readActiveIdentity();
+  if (currentUser.type === 'google' || identity?.type !== 'google') return false;
+  const session = await restorePersistedGoogleSession(initCloudClient(), 2500);
+  if (!session) return false;
+  await activateGoogleSession(session, true);
+  return true;
 }
 
 function extendedMetaDefaults() {
@@ -4758,7 +4884,36 @@ async function importUserBackup(file){if(!file)return;try{const data=JSON.parse(
 function clearCurrentUserData(){if(currentUser.type==='guest')return alert('وضع الضيف لا يحتوي على بيانات محفوظة.');if(!confirm('حذف كل بيانات هذا المستخدم من الجهاز؟ لا يمكن التراجع.'))return;localStorage.removeItem(`muaini_logs_${safeUserName()}`);localStorage.removeItem(`muaini_meta_${safeUserName()}`);localStorage.removeItem(`muaini_last_page_${safeUserName()}`);location.reload();}
 
 /* ===== الحساب السحابي ===== */
-async function initializeCloudAccount(){const client=initCloudClient();if(!client){renderCloudStatus();return;}const {data}=await client.auth.getSession();cloudSession=data.session||null;if(cloudSession)await loadCloudProfile();client.auth.onAuthStateChange(async(_event,session)=>{cloudSession=session;if(session)await loadCloudProfile();else cloudProfile=null;renderCloudStatus();});renderCloudStatus();}
+async function initializeCloudAccount(){
+  const client=initCloudClient();
+  if(!client){renderCloudStatus();return;}
+
+  const restoredSession=await restorePersistedGoogleSession(client,1200);
+  cloudSession=restoredSession||null;
+  if(cloudSession) await loadCloudProfile();
+
+  if(!muainiAuthListenerBound){
+    muainiAuthListenerBound=true;
+    client.auth.onAuthStateChange((event,session)=>{
+      cloudSession=session||null;
+      setTimeout(async()=>{
+        if(session){
+          await loadCloudProfile();
+          const identity=readActiveIdentity();
+          const shouldActivate=currentUser.type!=='google' && (
+            event==='SIGNED_IN' ||
+            (identity?.type==='google' && ['INITIAL_SESSION','TOKEN_REFRESHED','USER_UPDATED'].includes(event))
+          );
+          if(shouldActivate) await activateGoogleSession(session,true);
+        }else if(event==='SIGNED_OUT'){
+          cloudProfile=null;
+        }
+        renderCloudStatus();
+      },0);
+    });
+  }
+  renderCloudStatus();
+}
 async function cloudSignUp(){const client=initCloudClient();if(!client)return cloudConfigMessage();const email=document.getElementById('cloud-email').value.trim(),password=document.getElementById('cloud-password').value;if(password.length<6)return alert('كلمة السر 6 أحرف على الأقل.');const {error}=await client.auth.signUp({email,password,options:{data:{display_name:currentUser.name}}});if(error)return alert(error.message);alert('تم إنشاء الحساب. قد تحتاج لتأكيد البريد.');}
 async function cloudSignIn(){const client=initCloudClient();if(!client)return cloudConfigMessage();const email=document.getElementById('cloud-email').value.trim(),password=document.getElementById('cloud-password').value;const {data,error}=await client.auth.signInWithPassword({email,password});if(error)return alert(error.message);cloudSession=data.session;await loadCloudProfile();await syncCloudNow();renderCloudStatus();}
 async function cloudResetPassword(){const client=initCloudClient();if(!client)return cloudConfigMessage();const email=document.getElementById('cloud-email').value.trim();if(!email)return alert('اكتب البريد أولًا.');const {error}=await client.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)return alert(error.message);alert('تم إرسال رابط استعادة كلمة السر.');}
